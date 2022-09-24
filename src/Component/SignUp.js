@@ -1,15 +1,25 @@
-import React from "react";
+import React, { isValidElement } from "react";
 import { useState, useEffect } from "react";
 import userSignUp from '../API/signup';
+import checkUser from '../API/checkuser'
 
-function checkUser(props){
-
+function UsernameValid(props){
+    if(props.valid === 200) return (<p style={{
+        color: 'green'
+    }}>Username is able to use!</p>);
+    if(props.valid === 201) return (<p style={{
+        color: 'red'
+    }}>Username is used before!</p>);
 }
 
 function CheckPassword(props){
     if(props.cnfPassword === "") return (<p></p>);
-    if(props.password === props.cnfPassword) return (<p>Password matches.</p>);
-    else return(<p>Password doesn't matches</p>)
+    if(props.password === props.cnfPassword) return (<p style={{
+        color: 'green'
+    }}>Password matches.</p>);
+    else return(<p style={{
+        color: 'red'
+    }}>Password doesn't matches</p>)
 }
 
 function SignUp(){
@@ -17,7 +27,19 @@ function SignUp(){
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
     const [cnfPassword, setCnfPassword] = useState('');
-    const [valid, setValid] = useState(false);
+    const [valid, setValid] = useState(0);
+
+    useEffect(() => {
+        if(user === '') setValid(0);
+        const isUserValid = async(username) => {
+            const params = {
+                'username': username,
+            }
+            const result = await checkUser(params);
+            setValid(result.status)
+        }  
+        if(user !== '') isUserValid(user)
+    }, [user])
 
     const handleSubmit = async(e) => {
         e.preventDefault();
@@ -29,11 +51,9 @@ function SignUp(){
         setName('')
         setUser('')
         setPassword('')
-        setCnfPassword('')
-        
-        console.log(userSignUp(params))
-
-        
+        setCnfPassword('')    
+        const result = await userSignUp(params)
+        console.log(result)
     }
 
     return (
@@ -69,6 +89,8 @@ function SignUp(){
                 </input>
             </form>
 
+            <div><UsernameValid valid={valid}/></div>
+
             <form>
                 <label>Password</label>
                 <input
@@ -77,6 +99,7 @@ function SignUp(){
                     onChange={(e) => {
                         setPassword(e.target.value)
                     }}
+                    value={password}
                     autoComplete="off"
                     required>
                 </input>
@@ -90,6 +113,7 @@ function SignUp(){
                     onChange={(e) => {
                         setCnfPassword(e.target.value)
                     }}
+                    value={cnfPassword}
                     autoComplete="off"
                     required>
                 </input>

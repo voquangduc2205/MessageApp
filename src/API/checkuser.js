@@ -1,9 +1,8 @@
 const axios = require('axios').default;
 
-const userLogin = async(params) => {
-
+async function checkUser(params){
     try{
-        const response = await axios.post('http://localhost:3500/auth_login', params);
+        const response = await axios.post('http://localhost:3500/sign_up/check_user', params);
         console.log(response.data)
         return response.data;
     }catch(err){
@@ -12,4 +11,4 @@ const userLogin = async(params) => {
     }
 }
 
-export default userLogin;
+export default checkUser;

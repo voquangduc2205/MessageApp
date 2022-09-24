@@ -2,12 +2,8 @@ const axios = require('axios').default;
 
 async function userSignUp(params){
     try{
-        const response = await axios({
-            method: 'post',
-            url: 'http://localhost:3500/sign_up',
-            data: params,
-        })
-        return response;
+        const response = await axios.post('http://localhost:3500/sign_up', params);
+        return response.data;
     }catch(err){
         console.log(err)
         return err;
@@ -15,3 +11,5 @@ async function userSignUp(params){
 }
 
 export default userSignUp;
+
+

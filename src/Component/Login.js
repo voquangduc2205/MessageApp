@@ -1,25 +1,40 @@
 import React from "react";
 import {useEffect, useState, useRef} from 'react';
+import { Navigate, useNavigate } from "react-router-dom";
 
 import userLogin from '../API/login'
+
 const Login = () => {
-    const userRef = useRef();
     const [user, setUser] = useState('')
     const [password, setPassword] = useState('')
-    const [errMsg, setErrMsg] = useState('')
-    const [success, setSuccess] = useState('')
+    const [success, setSuccess] = useState(false)
+    const [showWarning, setShowWarning] = useState(false)
+    const [warning, setWarning] = useState('')
+
+    const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setUser('')
-        setPassword('')
-        setSuccess(true);
+        
         const params = {
             'username': user,
             'password': password
         }
-        console.log(params)
-        console.log(userLogin(params))
+        const result = await userLogin(params)
+        console.log(result);
+        if(result.status === 200){
+            navigate("/user/" + result.userID, {
+                userID: result.userID,
+            })
+        }else{
+            setShowWarning(true)
+            if(result.status == 202){
+                setWarning("Wrong password!")
+            }else{
+                setWarning("User doesn't exist!")
+            }
+        }
+
     }
 
     return(
@@ -61,6 +76,9 @@ const Login = () => {
                 </input>
             </form>
 
+            {showWarning && (<p style={{
+                color: 'red',
+            }}>{warning}</p>)}
             <button
                 id="btn_signin"
                 onClick={handleSubmit}
